@@ -406,12 +406,18 @@ class MSELoss(smp.utils.base.Loss):
         return torch.nn.MSELoss()(output, target)
 
 
-def train(args):
+def train(args, resume=True):
 
     torch.backends.cudnn.benchmark = True
 
     model = build_model(args)
-
+    if resume:
+        if args.model_path is not None:
+            model_path = args.model_path
+            checkpoint = torch.load(model_path)
+            model.load_state_dict(checkpoint)
+            model.to("cuda")
+    
     train_dataset = Dataset(sub_dir=args.train_sub_dir, args=args)
     val_dataset = Dataset(sub_dir=args.valid_sub_dir, args=args)
 
